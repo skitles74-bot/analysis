@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import type { ErpDataset } from "@/lib/types";
-import { CSV_FILE_SLOTS } from "@/lib/types";
 
 const PAGE_SIZE = 50;
 
@@ -67,6 +66,10 @@ function formatCell(value: unknown): string {
   return String(value);
 }
 
+function getCellValue(row: object, col: string): unknown {
+  return (row as Record<string, unknown>)[col];
+}
+
 interface DataTableViewerProps {
   dataset: ErpDataset;
 }
@@ -76,7 +79,7 @@ export function DataTableViewer({ dataset }: DataTableViewerProps) {
   const [page, setPage] = useState(1);
 
   const tabConfig = TAB_MAP[activeTab];
-  const rows = dataset[activeTab] as Record<string, unknown>[];
+  const rows = dataset[activeTab];
   const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
 
   const pageRows = useMemo(() => {
@@ -122,7 +125,7 @@ export function DataTableViewer({ dataset }: DataTableViewerProps) {
               <tr key={i}>
                 <td>{(page - 1) * PAGE_SIZE + i + 1}</td>
                 {tabConfig.columns.map((col) => (
-                  <td key={col}>{formatCell(row[col])}</td>
+                  <td key={col}>{formatCell(getCellValue(row, col))}</td>
                 ))}
               </tr>
             ))}
