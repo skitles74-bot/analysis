@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { toPng } from "html-to-image";
+import { useRef, useState } from "react";
+import html2canvas from "html2canvas";
 import type { ErpReport, KpiSummary } from "@/lib/types";
 import { exportReportDocx } from "@/lib/export/docx";
 import { exportReportPdf } from "@/lib/export/pdf";
@@ -22,15 +22,20 @@ interface ReportViewerProps {
 async function captureCharts(): Promise<{ label: string; dataUrl: string }[]> {
   const images: { label: string; dataUrl: string }[] = [];
 
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
   for (const chart of CHART_IDS) {
     const el = document.querySelector(`[data-chart-id="${chart.id}"]`);
     if (!el) continue;
     try {
-      const dataUrl = await toPng(el as HTMLElement, {
+      const canvas = await html2canvas(el as HTMLElement, {
+        scale: 2,
         backgroundColor: "#ffffff",
-        pixelRatio: 2,
+        logging: false,
       });
-      images.push({ label: chart.label, dataUrl });
+      images.push({ label: chart.label, dataUrl: canvas.toDataURL("image/png") });
     } catch {
       // skip failed capture
     }
@@ -42,23 +47,26 @@ async function captureCharts(): Promise<{ label: string; dataUrl: string }[]> {
 export function ReportViewer({ report, kpis }: ReportViewerProps) {
   const reportContentRef = useRef<HTMLDivElement>(null);
   const exporting = useRef(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const handleExport = async (format: "pdf" | "docx") => {
     if (exporting.current) return;
     exporting.current = true;
+    if (format === "pdf") setPdfLoading(true);
 
     try {
-      const chartImages = await captureCharts();
       if (format === "pdf") {
         if (!reportContentRef.current) {
           throw new Error("보고서 영역을 찾을 수 없습니다.");
         }
         await exportReportPdf(reportContentRef.current);
       } else {
+        const chartImages = await captureCharts();
         await exportReportDocx(report, kpis, chartImages);
       }
     } finally {
       exporting.current = false;
+      setPdfLoading(false);
     }
   };
 
@@ -69,8 +77,9 @@ export function ReportViewer({ report, kpis }: ReportViewerProps) {
           type="button"
           className="btn btn-secondary"
           onClick={() => handleExport("pdf")}
+          disabled={pdfLoading}
         >
-          PDF 다운로드
+          {pdfLoading ? "PDF 생성 중..." : "PDF 다운로드"}
         </button>
         <button
           type="button"

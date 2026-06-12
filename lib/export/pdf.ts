@@ -1,45 +1,44 @@
-import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
+import { captureElementAsPng } from "@/lib/export/capture";
 
 const MARGIN_MM = 10;
-const A4_WIDTH_MM = 210;
-const A4_HEIGHT_MM = 297;
-
-function loadImage(dataUrl: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = dataUrl;
-  });
-}
 
 export async function exportReportPdf(element: HTMLElement): Promise<void> {
-  const dataUrl = await toPng(element, {
-    backgroundColor: "#ffffff",
-    pixelRatio: 2,
-    cacheBust: true,
-  });
+  element.setAttribute("data-pdf-export-root", "true");
 
-  const img = await loadImage(dataUrl);
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  try {
+    const dataUrl = await captureElementAsPng(element);
 
-  const contentWidth = A4_WIDTH_MM - MARGIN_MM * 2;
-  const contentHeight = A4_HEIGHT_MM - MARGIN_MM * 2;
-  const imgHeightMm = (img.height * contentWidth) / img.width;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const printableHeight = pageHeight - MARGIN_MM * 2;
+    const imgWidth = pageWidth - MARGIN_MM * 2;
 
-  let heightLeft = imgHeightMm;
-  let yOffset = MARGIN_MM;
+    const img = new Image();
+    img.src = dataUrl;
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = reject;
+    });
 
-  doc.addImage(dataUrl, "PNG", MARGIN_MM, yOffset, contentWidth, imgHeightMm);
-  heightLeft -= contentHeight;
+    const imgHeight = (img.height * imgWidth) / img.width;
 
-  while (heightLeft > 0) {
-    yOffset = MARGIN_MM - (imgHeightMm - heightLeft);
-    doc.addPage();
-    doc.addImage(dataUrl, "PNG", MARGIN_MM, yOffset, contentWidth, imgHeightMm);
-    heightLeft -= contentHeight;
+    let heightLeft = imgHeight;
+    let y = MARGIN_MM;
+
+    doc.addImage(dataUrl, "PNG", MARGIN_MM, y, imgWidth, imgHeight);
+    heightLeft -= printableHeight;
+
+    while (heightLeft > 0) {
+      y = MARGIN_MM - (imgHeight - heightLeft);
+      doc.addPage();
+      doc.addImage(dataUrl, "PNG", MARGIN_MM, y, imgWidth, imgHeight);
+      heightLeft -= printableHeight;
+    }
+
+    doc.save(`erp-report-${Date.now()}.pdf`);
+  } finally {
+    element.removeAttribute("data-pdf-export-root");
   }
-
-  doc.save(`erp-report-${Date.now()}.pdf`);
 }

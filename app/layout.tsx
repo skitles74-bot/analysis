@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import { Noto_Sans_KR } from "next/font/google";
 import { DataProvider } from "@/lib/context/DataContext";
 import { AppNav } from "@/app/components/AppNav";
 import "./globals.css";
+
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+  variable: "--font-noto-sans-kr",
+});
 
 export const metadata: Metadata = {
   title: "ERP 데이터 분석 대시보드",
@@ -15,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>
+      <body className={`${notoSansKr.className} ${notoSansKr.variable}`}>
         <DataProvider>
           <div className="app app--wide">
             <header className="header">

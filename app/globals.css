@@ -22,7 +22,7 @@
 }
 
 body {
-  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-family: var(--font-noto-sans-kr), "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   background: var(--bg);
   background-image:
     radial-gradient(ellipse at 20% 0%, rgba(255, 215, 0, 0.14) 0%, transparent 55%),
