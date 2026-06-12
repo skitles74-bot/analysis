@@ -40,7 +40,7 @@ async function captureCharts(): Promise<{ label: string; dataUrl: string }[]> {
 }
 
 export function ReportViewer({ report, kpis }: ReportViewerProps) {
-  const exportRef = useRef<HTMLDivElement>(null);
+  const reportContentRef = useRef<HTMLDivElement>(null);
   const exporting = useRef(false);
 
   const handleExport = async (format: "pdf" | "docx") => {
@@ -50,7 +50,10 @@ export function ReportViewer({ report, kpis }: ReportViewerProps) {
     try {
       const chartImages = await captureCharts();
       if (format === "pdf") {
-        exportReportPdf(report, kpis, chartImages);
+        if (!reportContentRef.current) {
+          throw new Error("보고서 영역을 찾을 수 없습니다.");
+        }
+        await exportReportPdf(reportContentRef.current);
       } else {
         await exportReportDocx(report, kpis, chartImages);
       }
@@ -60,7 +63,7 @@ export function ReportViewer({ report, kpis }: ReportViewerProps) {
   };
 
   return (
-    <div className="report-viewer" ref={exportRef}>
+    <div className="report-viewer">
       <div className="report-actions">
         <button
           type="button"
@@ -78,7 +81,7 @@ export function ReportViewer({ report, kpis }: ReportViewerProps) {
         </button>
       </div>
 
-      <div className="report-result">
+      <div className="report-result" ref={reportContentRef}>
         <header className="report-header">
           <h2 className="report-title">ERP 경영 분석 보고서</h2>
           <p className="report-meta">
