@@ -1,12 +1,12 @@
 # ERP 데이터 분석 대시보드 & 자동 보고서
 
-ERP CSV 4종(상품·고객·주문·주문상세)을 업로드하면 경영 KPI 대시보드가 생성되고, Gemini AI가 분석 보고서를 작성합니다. 보고서는 PDF / Word(.docx)로 다운로드할 수 있습니다.
+ERP CSV 4종(상품·고객·주문·주문상세)을 업로드하면 경영 KPI 대시보드가 생성되고, Gemini 2.5 AI가 분석 보고서를 작성합니다. 보고서는 PDF / Word(.docx)로 다운로드할 수 있습니다.
 
 ## 기능
 
 - **CSV 업로드 & 즉시 유효성 검사** — 컬럼·타입·중복 PK·FK 참조·금액 일치 검증
 - **경영 KPI 대시보드** — 매출, 주문, TOP 상품, 지역/카테고리/등급별 분석
-- **Gemini AI 분석 보고서** — 경영 요약, 발견사항, 개선 제안, 리스크 경고
+- **Gemini 2.5 AI 분석 보고서** — gemini-2.5-flash 기반, 경영 요약·발견사항·개선 제안·리스크 경고
 - **PDF / DOCX 다운로드** — 표·차트 포함
 
 ## 시작하기
@@ -40,7 +40,7 @@ npm run dev
 
 ## 기술 스택
 
-Next.js 15 · React 19 · TypeScript · Zod · PapaParse · Recharts · jsPDF · docx · Gemini REST API
+Next.js 15 · React 19 · TypeScript · Zod · PapaParse · Recharts · jsPDF · docx · Gemini 2.5 REST API
 
 ## 사용 흐름
 

@@ -21,7 +21,7 @@ export default function RootLayout({
             <header className="header">
               <h1>ERP 데이터 분석 대시보드</h1>
               <p className="subtitle">
-                CSV 업로드 후 대시보드 · 보고서 · 원본데이터를 메뉴에서 이용하세요
+                CSV 업로드 후 대시보드 · 보고서 · 원본데이터를 메뉴에서 이용하세요 (Gemini 2.5)
               </p>
               <AppNav />
             </header>

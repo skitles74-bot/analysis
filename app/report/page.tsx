@@ -121,7 +121,7 @@ export default function ReportPage() {
         <div className="card">
           <h2 className="card-title">AI 분석 보고서</h2>
           <p className="card-desc">
-            Gemini AI가 KPI 데이터를 분석하여 경영 보고서를 작성합니다. 완료
+            Gemini 2.5 AI가 KPI 데이터를 분석하여 경영 보고서를 작성합니다. 완료
             후 PDF / Word(.docx)로 다운로드할 수 있습니다.
           </p>
 
